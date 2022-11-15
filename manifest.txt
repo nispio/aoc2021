@@ -1,0 +1,5 @@
+[MANIFEST]
+Name:          AOC2021
+Version:       1.0.0
+Date:          14-Nov-2022
+Description:   Advent of Code 2021 Option tree
