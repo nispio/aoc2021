@@ -1,0 +1,18 @@
+startmacro A:infile
+
+csvconvert infile input01 1000
+
+SAY "== FIRST STAR =="
+pipe on
+  fcalc _increase input01(2:) input01(1:) GT
+  fstat _increase SUM
+pipe off
+
+SAY "== SECOND STAR =="
+pipe on
+  fcalc _win3 input01(1:) input01(2:) input01(3:) + +
+  fcalc _increase3 _win3(2:) _win3(1:) GT
+  fstat _increase3 SUM
+pipe off
+
+endmacro
