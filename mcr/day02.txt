@@ -1,0 +1,48 @@
+startmacro A:infile
+local n xpos ypos aim xy direction magnitude
+
+csvconvert ^infile input02 1000 2A
+
+say " == First Star == "
+res L:xpos 0
+res L:ypos 0
+envi/quiet file open input02
+loop input02(hcb.sz) n
+  sedit input02(n) A:direction PARSE 1
+  sedit input02(n) L:magnitude PARSE 2
+  IF direction EQS forward
+    calc/quiet xpos xpos magnitude +
+  ELSEIF direction EQS up
+    calc/quiet ypos ypos magnitude -
+  ELSEIF direction EQS down
+    calc/quiet ypos ypos magnitude +
+  ENDIF
+endloop
+envi/quiet file close input02
+calc/quiet xy xpos ypos *
+say "Final position: (^xpos, ^ypos), X*Y = ^xy"
+
+
+say " == Second Star == "
+res L:xpos 0
+res L:ypos 0
+res L:aim 0
+envi/quiet file open input02
+loop input02(hcb.sz) n
+  sedit input02(n) A:direction PARSE 1
+  sedit input02(n) L:magnitude PARSE 2
+  IF direction EQS forward
+    calc/quiet xpos xpos magnitude +
+    calc/quiet ypos ypos aim magnitude * +
+  ELSEIF direction EQS up
+    calc/quiet aim aim magnitude -
+  ELSEIF direction EQS down
+    calc/quiet aim aim magnitude +
+  ENDIF
+endloop
+envi/quiet file close input02
+calc/quiet xy xpos ypos *
+say "Final position: (^xpos, ^ypos), X*Y = ^xy"
+
+
+endmacro
