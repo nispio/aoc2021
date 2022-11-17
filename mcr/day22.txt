@@ -1,8 +1,11 @@
 startmacro A:infile
-local n xpos ypos aim xy direction magnitude string
+local n nx ny nz ix iy iz num_cubes
 
 csvconvert/delim="=" ^infile input22 3000 on/1A x/4A y/4A z/4A
 f3000/size=input22(hcb.sz) steps on/sb xmin/sl xmax/sl ymin/sl ymax/sl zmin/sl zmax/sl
+
+! Save declaring these locals until after the lines above with colliding names
+local x y z xmin xmax ymin ymax zmin zmax on
 
 envi/quiet file open input22
 envi/quiet file open steps
