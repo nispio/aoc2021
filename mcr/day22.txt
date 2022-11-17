@@ -7,23 +7,52 @@ f3000/size=input22(hcb.sz) steps on/sb xmin/sl xmax/sl ymin/sl ymax/sl zmin/sl z
 envi/quiet file open input22
 envi/quiet file open steps
 loop input22(hcb.sz) n
-  sedit input22(^n;~on) steps(^n;~on)  SEARCH "on"
-  sedit input22(^n;~x) steps(^n;~xmin) ELEMENT 1 ..
-  sedit input22(^n;~x) steps(^n;~xmax) ELEMENT 2 .. RANGE 1 -2
-  sedit input22(^n;~y) steps(^n;~ymin) ELEMENT 1 ..
-  sedit input22(^n;~y) steps(^n;~ymax) ELEMENT 2 .. RANGE 1 -2
-  sedit input22(^n;~z) steps(^n;~zmin) ELEMENT 1 ..
-  sedit input22(^n;~z) steps(^n;~zmax) ELEMENT 2 ..
+  sedit input22(n;~on) steps(n;~on)  UPCASE SEARCH "ON"
+  sedit input22(n;~x) steps(n;~xmin) ELEMENT 1 ..
+  sedit input22(n;~x) steps(n;~xmax) ELEMENT 2 .. RANGE 1 -2
+  sedit input22(n;~y) steps(n;~ymin) ELEMENT 1 ..
+  sedit input22(n;~y) steps(n;~ymax) ELEMENT 2 .. RANGE 1 -2
+  sedit input22(n;~z) steps(n;~zmin) ELEMENT 1 ..
+  sedit input22(n;~z) steps(n;~zmax) ELEMENT 2 ..
 endloop
 envi/quiet file close steps
 envi/quiet file close input22
 
-! xdatalist/bg steps
 
 say " == First Star == "
-f3000 cuboids xmin/sl xmax/sl ymin/sl ymax/sl zmin/sl zmax/sl
-envi/quiet file open cuboids
-envi/quiet file close cuboids
+constant cubes SB 101*101*101 0
+envi/quiet file open steps
+envi/quiet file open cubes
+loop steps(hcb.sz) n
+  res on steps(n;~on)
+  ! Precomputing outside the nested loops saves considerable time
+  ! Trim off any portions that are out of the range -50:50
+  ! Then add a translation to create positive indices 1-101
+  res L:xmin calc(steps(n;~xmin) -50 MAX 51 MIN 51 +)
+  res L:xmax calc(steps(n;~xmax) -51 MAX 50 MIN 51 +)
+  res L:ymin calc(steps(n;~ymin) -50 MAX 51 MIN 51 +)
+  res L:ymax calc(steps(n;~ymax) -51 MAX 50 MIN 51 +)
+  res L:zmin calc(steps(n;~zmin) -50 MAX 51 MIN 51 +)
+  res L:zmax calc(steps(n;~zmax) -51 MAX 50 MIN 51 +)
+  res L:nx xmax-xmin+1
+  res L:ny ymax-ymin+1
+  res L:nz zmax-zmin+1
+  res L:num_cubes nx*ny*nz
+  say "Step ^{n}: ^{nx}*^{ny}*^{nz} = ^num_cubes cubes ^on"
+  loop nx ix
+    res L:x (xmin+ix)*10201
+    loop ny iy
+      res L:y (ymin+iy)*101
+      loop nz iz
+        res cubes(x+y+zmin+iz) ^on
+      endloop
+    endloop
+  endloop
+endloop
+envi/quiet file close cubes
+envi/quiet file close steps
+
+fstat cubes SUM
 
 
 endmacro
